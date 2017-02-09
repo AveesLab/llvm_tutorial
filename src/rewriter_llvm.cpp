@@ -1,3 +1,4 @@
+#include <fstream>
 #include <sstream>
 #include <string>
 #include <iostream>
@@ -25,7 +26,15 @@ class MyASTVisitor : public RecursiveASTVisitor<MyASTVisitor>
     public:
         MyASTVisitor(Rewriter &R) : TheRewriter(R) {}
 
-    //do something using visit method
+        bool VisitFunctionDecl(FunctionDecl *FD)
+        {
+            SourceLocation SL = FD->getSourceRange().getBegin();
+            string insertText = "// this is a Function Declaration\n";
+
+            TheRewriter.InsertText(SL, insertText);
+            
+            return true;
+        }
 
     private:
         Rewriter &TheRewriter;
@@ -59,6 +68,26 @@ class MyFrontendAction : public ASTFrontendAction
         {
             TheRewriter.setSourceMgr(CI.getSourceManager(), CI.getLangOpts());
             return llvm::make_unique<MyASTConsumer>(TheRewriter);
+        }
+
+        void EndSourceFileAction()
+        {
+            SourceManager &SM = TheRewriter.getSourceMgr();
+            const RewriteBuffer *RewriteBuf = TheRewriter.getRewriteBufferFor(SM.getMainFileID());
+
+            string file = SM.getFileEntryForID(SM.getMainFileID())->getName();
+
+            if(RewriteBuf != NULL)
+            {
+                file += ".new";
+                ofstream dst(file, ios::binary);
+                dst<<string(RewriteBuf->begin(), RewriteBuf->end());
+                cout<<"File "<<file<<" is changed."<<endl;
+            }
+            else
+            {
+                cout<<"File "<<file<<" is not changed."<<endl;
+            }
         }
 
     private:

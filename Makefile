@@ -62,7 +62,10 @@ OBJS := $(filter-out $(MAINOBJ), $(SOURCES:%.cpp=%.o))
 .PHONY: all
 all: lex \
 	basic \
-	basic_fin
+	basic_fin\
+	rewriter\
+	p1\
+	p2
 
 .PHONY: make_build
 lex : $(SRC_DIR)/lex_example.cpp
@@ -77,7 +80,20 @@ basic_fin : $(SRC_DIR)/basic_llvm_fin.cpp
 	$(CXX) $(CXXFLAGS) $(LLVM_CXXFLAGS) $(CLANG_INCLUDES) $^ \
 	$(CLANG_LIBS) $(LLVM_LDFLAGS) -o $@
 
+rewriter : $(SRC_DIR)/rewriter_llvm.cpp
+	$(CXX) $(CXXFLAGS) $(LLVM_CXXFLAGS) $(CLANG_INCLUDES) $^ \
+	$(CLANG_LIBS) $(LLVM_LDFLAGS) -o $@
+
+p1 : $(SRC_DIR)/practice_llvm1.cpp
+	$(CXX) $(CXXFLAGS) $(LLVM_CXXFLAGS) $(CLANG_INCLUDES) $^ \
+	$(CLANG_LIBS) $(LLVM_LDFLAGS) -o $@
+
+
+p2 : $(SRC_DIR)/practice_llvm2.cpp
+	$(CXX) $(CXXFLAGS) $(LLVM_CXXFLAGS) $(CLANG_INCLUDES) $^ \
+	$(CLANG_LIBS) $(LLVM_LDFLAGS) -o $@
+
 .PHONY: clean
 clean:
 	rm -f $(SRC_DIR)/*.o
-	rm -f lex basic basic_fin
+	rm -f lex basic basic_fin rewriter p1 p2

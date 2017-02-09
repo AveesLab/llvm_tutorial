@@ -24,7 +24,7 @@ struct ParmInfo
 {
     string name;
     string type;
-}
+};
 
 struct FuncInfo
 {
